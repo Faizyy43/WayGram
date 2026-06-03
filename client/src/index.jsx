@@ -1,18 +1,19 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import "./styles/global.css";
 import App from "./App.jsx";
 import reportWebVitals from "./reportWebVitals";
+import DataProvider from "./redux/store";
 
-import DataProvider from './redux/store';
+const container = document.getElementById("root");
+const root = createRoot(container);
 
-ReactDOM.render(
+root.render(
   <React.StrictMode>
     <DataProvider>
       <App />
     </DataProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
 
 reportWebVitals();

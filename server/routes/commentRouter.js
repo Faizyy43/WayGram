@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const auth = require("../middleware/auth");
-const commentCtrl = require("../controllers/commentCtrl");
+import { Router } from "express";
+import auth from "../middleware/auth.js";
+import commentCtrl from "../controllers/commentCtrl.js";
+
+const router = Router();
 
 router.post('/comment', auth, commentCtrl.createComment);
 
@@ -12,4 +14,4 @@ router.delete("/comment/:id", auth, commentCtrl.deleteComment);
 
 
 
-  module.exports = router;
+export default router;

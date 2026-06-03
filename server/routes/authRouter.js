@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const authCtrl = require('../controllers/authCtrl');
-const auth = require('../middleware/auth');
+import { Router } from "express";
+import authCtrl from "../controllers/authCtrl.js";
+import auth from "../middleware/auth.js";
 
+const router = Router();
 
 router.post('/register', authCtrl.register);
 router.post("/register_admin", authCtrl.registerAdmin);
@@ -18,4 +19,4 @@ router.post("/logout", authCtrl.logout);
 router.post("/refresh_token", authCtrl.generateAccessToken);
 
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const Users = require("../models/userModel");
+import Users from "../models/userModel.js";
 
 const userCtrl = {
   searchUser: async (req, res) => {
@@ -155,4 +155,4 @@ const userCtrl = {
 
 };
 
-module.exports = userCtrl;
+export default userCtrl;

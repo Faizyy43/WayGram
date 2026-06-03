@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const auth = require("../middleware/auth");
-const postCtrl = require("../controllers/postCtrl");
+import { Router } from "express";
+import auth from "../middleware/auth.js";
+import postCtrl from "../controllers/postCtrl.js";
+
+const router = Router();
 
 router.route("/posts")
   .post(auth, postCtrl.createPost)
@@ -27,4 +29,4 @@ router.get("/getSavePosts", auth, postCtrl.getSavePost);
 
 
 
-module.exports = router;
+export default router;

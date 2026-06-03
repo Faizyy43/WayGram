@@ -1,5 +1,5 @@
-const Conversations = require('../models/conversationModel');
-const Messages = require('../models/messageModel');
+import Conversations from '../models/conversationModel.js';
+import Messages from '../models/messageModel.js';
 
 
 class APIfeatures {
@@ -102,4 +102,4 @@ const messageCtrl = {
   },
 };
 
-module.exports = messageCtrl;
+export default messageCtrl;

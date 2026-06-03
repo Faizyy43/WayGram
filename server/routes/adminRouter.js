@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const auth = require("../middleware/auth");
-const adminCtrl = require("../controllers/adminCtrl");
+import { Router } from "express";
+import auth from "../middleware/auth.js";
+import adminCtrl from "../controllers/adminCtrl.js";
+
+const router = Router();
 
 router.get('/get_total_users' , auth, adminCtrl.getTotalUsers);
 router.get("/get_total_posts", auth, adminCtrl.getTotalPosts);
@@ -11,4 +13,4 @@ router.get("/get_spam_posts", auth, adminCtrl.getSpamPosts);
 router.delete("/delete_spam_posts/:id", auth, adminCtrl.deleteSpamPost);
 
 
-module.exports = router;
+export default router;

@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const auth = require('../middleware/auth');
-const notifyCtrl = require('../controllers/notifyCtrl');
+import { Router } from "express";
+import auth from "../middleware/auth.js";
+import notifyCtrl from "../controllers/notifyCtrl.js";
 
+const router = Router();
 
 router.post('/notify', auth, notifyCtrl.createNotify);
 
@@ -15,4 +16,4 @@ router.delete("/deleteAllNotify", auth, notifyCtrl.deleteAllNotifies);
 
 
 
-module.exports = router;
+export default router;

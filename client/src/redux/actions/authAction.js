@@ -2,127 +2,73 @@ import { getErrorMessage, postDataAPI } from "../../utils/fetchData";
 import { GLOBALTYPES } from "./globalTypes";
 import valid from "../../utils/valid";
 
-export const TYPES = {
-  AUTH: "AUTH",
+const authSuccess = (dispatch, { access_token, user, msg }) => {
+  dispatch({ type: GLOBALTYPES.AUTH, payload: { token: access_token, user } });
+  dispatch({ type: GLOBALTYPES.USER_TYPE, payload: user.role });
+  localStorage.setItem("firstLogin", true);
+  dispatch({ type: GLOBALTYPES.ALERT, payload: { success: msg } });
+};
+
+const handleRequest = async (dispatch, url, payload, authToken) => {
+  dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
+  const response = await postDataAPI(url, payload, authToken);
+  dispatch({ type: GLOBALTYPES.ALERT, payload: {} });
+  return response.data;
+};
+
+const validatePasswordUpdate = ({ oldPassword, newPassword, cnfNewPassword }) => {
+  if (!oldPassword) return "Please enter your old password.";
+  if (!newPassword) return "Please enter your new password.";
+  if (!cnfNewPassword) return "Please confirm your new password.";
+  if (newPassword !== cnfNewPassword) return "New passwords do not match.";
+  if (newPassword.length < 6) return "Password must be at least 6 characters long.";
+  return null;
 };
 
 export const login = (data) => async (dispatch) => {
   try {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
-    const res = await postDataAPI("login", data);
-
-    dispatch({
-      type: GLOBALTYPES.AUTH,
-      payload: { token: res.data.access_token, user: res.data.user },
-    });
-
-    dispatch({
-      type: GLOBALTYPES.USER_TYPE,
-      payload: res.data.user.role,
-    });
-
-    localStorage.setItem("firstLogin", true);
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+    const response = await handleRequest(dispatch, "login", data);
+    authSuccess(dispatch, response);
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };
 
-export const changePassword = ({oldPassword, newPassword, cnfNewPassword, auth}) => async (dispatch) => {
+export const changePassword = ({ oldPassword, newPassword, cnfNewPassword, auth }) => async (dispatch) => {
+  const error = validatePasswordUpdate({ oldPassword, newPassword, cnfNewPassword });
+  if (error) return dispatch({ type: GLOBALTYPES.ALERT, payload: { error } });
 
-  if(!oldPassword || oldPassword.length === 0){
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: "Please enter your old  password." },
-    });
-  }
-  if(!newPassword || newPassword.length === 0){
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: "Please enter your new  password." },
-    });
-  }
-  if(!cnfNewPassword || cnfNewPassword.length === 0){
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: "Please confirm your new  password." },
-    });
-  }
-  if(newPassword !==cnfNewPassword){
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: "Your password does not match" },
-    });
-  }
-  
   try {
-    
-    
-
-    dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: true} });
-
-    const res = await postDataAPI('changePassword', {oldPassword, newPassword}, auth.token );
-
-    dispatch({ type: GLOBALTYPES.ALERT, payload: {loading: false} });
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+    const response = await handleRequest(dispatch, "changePassword", { oldPassword, newPassword }, auth.token);
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: response.msg } });
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };
 
 export const adminLogin = (data) => async (dispatch) => {
   try {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
-    const res = await postDataAPI("admin_login", data);
-
-    dispatch({
-      type: GLOBALTYPES.AUTH,
-      payload: { token: res.data.access_token, user: res.data.user },
-    });
-
-    dispatch({
-      type: GLOBALTYPES.USER_TYPE,
-      payload: res.data.user.role,
-    });
-
-    localStorage.setItem("firstLogin", true);
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+    const response = await handleRequest(dispatch, "admin_login", data);
+    authSuccess(dispatch, response);
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };
 
 export const refreshToken = () => async (dispatch) => {
   const firstLogin = localStorage.getItem("firstLogin");
-  if (firstLogin) {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
-    try {
-      const res = await postDataAPI("refresh_token");
-      dispatch({
-        type: GLOBALTYPES.AUTH,
-        payload: { token: res.data.access_token, user: res.data.user },
-      });
+  if (!firstLogin) return;
 
-      dispatch({
-        type: GLOBALTYPES.USER_TYPE,
-        payload: res.data.user.role,
-      });
-
-      dispatch({ type: GLOBALTYPES.ALERT, payload: {} });
-    } catch (err) {
-      localStorage.removeItem("firstLogin");
-      dispatch({ type: GLOBALTYPES.AUTH, payload: {} });
-      dispatch({ type: GLOBALTYPES.ALERT, payload: {} });
-    }
+  dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
+  try {
+    const response = await postDataAPI("refresh_token");
+    dispatch({ type: GLOBALTYPES.AUTH, payload: { token: response.data.access_token, user: response.data.user } });
+    dispatch({ type: GLOBALTYPES.USER_TYPE, payload: response.data.user.role });
+  } catch (err) {
+    localStorage.removeItem("firstLogin");
+    dispatch({ type: GLOBALTYPES.AUTH, payload: {} });
+  } finally {
+    dispatch({ type: GLOBALTYPES.ALERT, payload: {} });
   }
 };
 
@@ -133,27 +79,10 @@ export const register = (data) => async (dispatch) => {
   }
 
   try {
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
-
-    const res = await postDataAPI("register", data);
-
-    dispatch({
-      type: GLOBALTYPES.AUTH,
-      payload: { token: res.data.access_token, user: res.data.user },
-    });
-
-    dispatch({
-      type: GLOBALTYPES.USER_TYPE,
-      payload: res.data.user.role,
-    });
-
-    localStorage.setItem("firstLogin", true);
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+    const response = await handleRequest(dispatch, "register", data);
+    authSuccess(dispatch, response);
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };
 
@@ -165,28 +94,19 @@ export const registerAdmin = (data) => async (dispatch) => {
 
   try {
     dispatch({ type: GLOBALTYPES.ALERT, payload: { loading: true } });
-
-    const res = await postDataAPI("register_admin", data);
-
-    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: res.data.msg } });
+    const response = await postDataAPI("register_admin", data);
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { success: response.data.msg } });
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };
 
 export const logout = () => async (dispatch) => {
   try {
     localStorage.removeItem("firstLogin");
-
     await postDataAPI("logout");
     window.location.href = "/";
   } catch (err) {
-    dispatch({
-      type: GLOBALTYPES.ALERT,
-      payload: { error: getErrorMessage(err) },
-    });
+    dispatch({ type: GLOBALTYPES.ALERT, payload: { error: getErrorMessage(err) } });
   }
 };

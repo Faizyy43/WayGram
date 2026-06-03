@@ -1,6 +1,6 @@
-const Posts = require("../models/postModel");
-const Comments = require("../models/commentModel");
-const Users = require("../models/userModel");
+import Posts from "../models/postModel.js";
+import Comments from "../models/commentModel.js";
+import Users from "../models/userModel.js";
 
 class APIfeatures  {
   constructor(query, queryString){
@@ -345,4 +345,4 @@ const postCtrl = {
   },
 };
 
-module.exports = postCtrl;
+export default postCtrl;

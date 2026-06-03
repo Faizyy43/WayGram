@@ -24,8 +24,11 @@ import SocketClient from "./SocketClient";
 function App() {
   const { auth, status, modal, userType, socket } = useSelector((state) => state);
   const dispatch = useDispatch();
-  const showUserShell = userType === "user" && auth.token;
-  const isSocketReady = socket && typeof socket.emit === "function" && typeof socket.on === "function";
+  const showUserShell = userType === "user" && Boolean(auth.token);
+  const socketReady = socket?.emit && socket?.on;
+  const pageShellClass = showUserShell
+    ? "min-h-screen pb-[calc(72px+env(safe-area-inset-bottom))] lg:pl-[76px] lg:pb-0"
+    : "h-[100dvh] overflow-hidden";
 
   useEffect(() => {
     dispatch(refreshToken());
@@ -33,37 +36,39 @@ function App() {
 
   useEffect(() => {
     if (!auth.token) return;
-    const socket = io(BACKEND_URL, {
+
+    const socketInstance = io(BACKEND_URL, {
       transports: ["websocket", "polling"],
       withCredentials: true,
     });
 
-    dispatch({ type: GLOBALTYPES.SOCKET, payload: socket });
+    dispatch({ type: GLOBALTYPES.SOCKET, payload: socketInstance });
+
     return () => {
+      socketInstance.close();
       dispatch({ type: GLOBALTYPES.SOCKET, payload: null });
-      socket.close();
     };
   }, [dispatch, auth.token]);
 
   useEffect(() => {
-    if (auth.token) {
-      dispatch(getPosts(auth.token));
-      dispatch(getSuggestions(auth.token));
-      dispatch(getNotifies(auth.token));
-    }
+    if (!auth.token) return;
+    dispatch(getPosts(auth.token));
+    dispatch(getSuggestions(auth.token));
+    dispatch(getNotifies(auth.token));
   }, [dispatch, auth.token]);
 
   useEffect(() => {
-    if (!("Notification" in window)) {
-      alert("This browser does not support desktop notification");
-    } else if (Notification.permission === "granted") {
-    } else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(function (permission) {
-        if (permission === "granted") {
-        }
-      });
+    if (!("Notification" in window)) return;
+    if (Notification.permission === "default") {
+      Notification.requestPermission();
     }
   }, []);
+
+  const LandingPage = auth.token
+    ? userType === "user"
+      ? Home
+      : AdminDashboard
+    : Login;
 
   return (
     <Router>
@@ -71,39 +76,18 @@ function App() {
       <input type="checkbox" id="theme" />
       <div className={`App app-shell ${(status || modal) && "mode"}`}>
         {showUserShell && <SidebarNav />}
-        <div
-          className={`text-slate-100 ${
-            showUserShell
-              ? "min-h-screen pb-[calc(72px+env(safe-area-inset-bottom))] lg:pl-[76px] lg:pb-0"
-              : "h-[100dvh] overflow-hidden"
-          }`}
-        >
+        <div className={`text-slate-100 ${pageShellClass}`}>
           {status && <StatusModal />}
-          {auth.token && isSocketReady && <SocketClient />}
-          <Route
-            exact
-            path="/"
-            component={
-              userType === "user"
-                ? auth.token
-                  ? Home
-                  : Login
-                : auth.token
-                ? AdminDashboard
-                : Login
-            }
-          />
+          {auth.token && socketReady && <SocketClient />}
 
-          {userType === "user" && (
-            <>
-              <Route exact path="/register" component={Register} />
-              {auth.token && (
-                <div className="wrap_page">
-                  <PrivateRouter exact path="/:page" component={PageRender} />
-                  <PrivateRouter exact path="/:page/:id" component={PageRender} />
-                </div>
-              )}
-            </>
+          <Route exact path="/" component={LandingPage} />
+          <Route exact path="/register" component={Register} />
+
+          {auth.token && userType === "user" && (
+            <div className="wrap_page">
+              <PrivateRouter exact path="/:page" component={PageRender} />
+              <PrivateRouter exact path="/:page/:id" component={PageRender} />
+            </div>
           )}
         </div>
       </div>

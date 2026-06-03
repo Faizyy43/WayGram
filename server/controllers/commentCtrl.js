@@ -1,5 +1,5 @@
-const Comments = require("../models/commentModel");
-const Posts = require("../models/postModel");
+import Comments from "../models/commentModel.js";
+import Posts from "../models/postModel.js";
 
 const commentCtrl = {
   createComment: async (req, res) => {
@@ -122,4 +122,4 @@ const commentCtrl = {
   },
 };
 
-module.exports = commentCtrl;
+export default commentCtrl;

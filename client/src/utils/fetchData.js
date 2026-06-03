@@ -1,46 +1,25 @@
-import axios from 'axios';
+import axios from "axios";
 
-const getConfig = (token) => ({
-  headers: { Authorization: token },
+const api = axios.create({
+  baseURL: "/api",
   withCredentials: true,
 });
 
-export const getDataAPI = async (url, token) => {
-  const res = await axios.get(`/api/${url}`, getConfig(token));
-  return res;
-};
+const getConfig = (token) => ({
+  headers: token ? { Authorization: token } : undefined,
+});
 
-export const postDataAPI = async (url, post, token) => {
-  const res = await axios.post(`/api/${url}`, post, getConfig(token));
-  return res;
-};
+export const getDataAPI = (url, token) => api.get(url, getConfig(token));
+export const postDataAPI = (url, payload, token) => api.post(url, payload, getConfig(token));
+export const putDataAPI = (url, payload, token) => api.put(url, payload, getConfig(token));
+export const patchDataAPI = (url, payload, token) => api.patch(url, payload, getConfig(token));
+export const deleteDataAPI = (url, token) => api.delete(url, getConfig(token));
 
-export const putDataAPI = async (url, post, token) => {
-  const res = await axios.put(`/api/${url}`, post, getConfig(token));
-  return res;
-};
-
-export const patchDataAPI = async (url, post, token) => {
-  const res = await axios.patch(`/api/${url}`, post, getConfig(token));
-  return res;
-};
-
-export const deleteDataAPI = async (url, token) => {
-  const res = await axios.delete(`/api/${url}`, getConfig(token));
-  return res;
-};
-
-export const getErrorMessage = (err) => {
-  return (
-    err?.response?.data?.msg ||
-    err?.response?.data?.message ||
-    err?.message ||
-    "Something went wrong. Please try again."
-  );
-};
+export const getErrorMessage = (err) =>
+  err?.response?.data?.msg || err?.response?.data?.message || err?.message || "Something went wrong. Please try again.";
 
 export const emitSocket = (socket, eventName, payload) => {
-  if (socket && typeof socket.emit === "function") {
+  if (socket?.emit) {
     socket.emit(eventName, payload);
   }
 };

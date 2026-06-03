@@ -1,4 +1,4 @@
-const Notifies = require('../models/notifyModel');
+import Notifies from '../models/notifyModel.js';
 
 
 const notifyCtrl = {
@@ -75,4 +75,4 @@ const notifyCtrl = {
   },
 };
 
-module.exports = notifyCtrl;
+export default notifyCtrl;

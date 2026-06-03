@@ -1,6 +1,6 @@
-const Posts = require("../models/postModel");
-const Users = require("../models/userModel");
-const Comments = require("../models/commentModel");
+import Posts from "../models/postModel.js";
+import Users from "../models/userModel.js";
+import Comments from "../models/commentModel.js";
 
 
 const adminCtrl = {
@@ -85,4 +85,4 @@ const adminCtrl = {
   },
 };
 
-module.exports = adminCtrl;
+export default adminCtrl;

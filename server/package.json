@@ -1,21 +1,21 @@
 {
   "name": "mern",
-  "version": "1.0.0",
-  "description": "API server for the social media app.",
+  "version": "2.0.0",
+  "description": "WayGram API server",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "set NODE_NO_WARNINGS=1&& nodemon server.js"
   },
-  "keywords": [],
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "cookie-parser": "^1.4.5",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^8.6.0",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.6.2",
-    "socket.io": "^4.0.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.1.0",
+    "mongoose": "^9.8.2",
+    "socket.io": "^4.7.2"
   }
 }
