@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GLOBALTYPES } from "../redux/actions/globalTypes";
 import { createPost, updatePost } from "../redux/actions/postAction";
 import Icons from "./Icons";
-import { imageShow, videoShow } from "../utils/mediaShow";
+import { imageShow, videoShow } from "../utils/mediaShow.jsx";
 
 const StatusModal = () => {
   const { auth, theme, status, socket } = useSelector((state) => state);

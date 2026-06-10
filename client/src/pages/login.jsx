@@ -44,9 +44,6 @@ const Login = () => {
           <div className="w-full max-w-[360px] rounded-[24px] bg-[#18191d]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2.5">
-                <div className="grid h-11 w-11 place-items-center rounded-[16px] bg-gradient-to-br from-amber-400 via-fuchsia-500 to-indigo-500 shadow-lg">
-                  <span className="material-icons text-[25px] text-white">photo_camera</span>
-                </div>
                 <div>
                   <h1 className="m-0 text-[32px] font-bold tracking-tight text-white">WayGram</h1>
                   <p className="m-0 mt-1.5 text-sm leading-6 text-neutral-400">

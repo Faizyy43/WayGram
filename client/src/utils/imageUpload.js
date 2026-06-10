@@ -17,9 +17,9 @@ export const checkImage = (file) => {
 
 export const imageUpload = async (images) => {
     let imgArr = [];
-    const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
-    const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
-    const uploadUrl = process.env.REACT_APP_CLOUDINARY_UPLOAD_URL;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadUrl = import.meta.env.VITE_CLOUDINARY_UPLOAD_URL;
 
     if (!uploadPreset || !cloudName || !uploadUrl) {
         throw new Error("Cloudinary upload environment variables are missing.");
